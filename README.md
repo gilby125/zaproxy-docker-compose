@@ -13,12 +13,12 @@ Docker Compose configuration for running OWASP ZAP (Zed Attack Proxy) on Dokploy
 
 1. Create a new Docker Compose service in Dokploy
 2. Paste the contents of `docker-compose.yml`
-3. Add DNS A record: `zap.throughfire.net` → your server IP
+3. Add DNS A record: `zap.yourdomain.com` → your server IP
 4. Deploy
 
 ## Access
 
-Access the ZAP web UI at: https://zap.throughfire.net
+Access the ZAP web UI at: https://zap.yourdomain.com
 
 ## Ports
 
