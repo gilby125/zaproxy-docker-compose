@@ -1,0 +1,26 @@
+services:
+  zaproxy:
+    image: zaproxy/zap-stable:latest
+    user: zap
+    command: zap-webswing.sh
+    expose:
+      - 8080
+      - 8090
+    environment:
+      - ZAP_PORT=8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.zaproxy.rule=Host(`zap.throughfire.net`)
+      - traefik.http.routers.zaproxy.entrypoints=websecure
+      - traefik.http.routers.zaproxy.tls.certresolver=letsencrypt
+      - traefik.http.services.zaproxy.loadbalancer.server.port=8080
+    volumes:
+      - zap-data:/zap/wrk:rw
+
+volumes:
+  zap-data:
+
+networks:
+  default:
+    name: dokploy-network
+    external: true
