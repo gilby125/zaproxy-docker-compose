@@ -13,6 +13,7 @@ services:
       - traefik.http.routers.zaproxy.rule=Host(`${ZAP_DOMAIN}`)
       - traefik.http.routers.zaproxy.entrypoints=websecure
       - traefik.http.routers.zaproxy.tls.certresolver=letsencrypt
+      - traefik.http.routers.zaproxy.service=zaproxy
       - traefik.http.services.zaproxy.loadbalancer.server.port=8080
     volumes:
       - zap-data:/zap/wrk:rw
