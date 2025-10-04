@@ -1,6 +1,6 @@
-# ZAP Proxy for Dokploy
+# ZAP Proxy Docker Compose
 
-Docker Compose configuration for running OWASP ZAP (Zed Attack Proxy) on Dokploy with Traefik reverse proxy.
+Docker Compose configuration for running OWASP ZAP (Zed Attack Proxy) with Traefik reverse proxy.
 
 ## Features
 
@@ -11,17 +11,15 @@ Docker Compose configuration for running OWASP ZAP (Zed Attack Proxy) on Dokploy
 
 ## Configuration
 
-Set the following environment variable in Dokploy:
+Set the following environment variable:
 
 - `ZAP_DOMAIN`: Your domain for ZAP (e.g., `zap.yourdomain.com`)
 
 ## Deployment
 
-1. Create a new Docker Compose service in Dokploy
-2. Paste the contents of `docker-compose.yml`
-3. Add environment variable: `ZAP_DOMAIN=zap.yourdomain.com`
-4. Add DNS A record: `zap.yourdomain.com` → your server IP
-5. Deploy
+1. Copy `.env.example` to `.env` and set `ZAP_DOMAIN`
+2. Add DNS A record: `zap.yourdomain.com` → your server IP
+3. Deploy with `docker compose up -d`
 
 ## Access
 
