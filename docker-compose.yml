@@ -10,8 +10,10 @@ services:
       - ZAP_PORT=8080
     labels:
       - traefik.enable=true
+      - traefik.docker.network=dokploy-network
       - traefik.http.routers.zaproxy.rule=Host(`${ZAP_DOMAIN}`)
       - traefik.http.routers.zaproxy.entrypoints=websecure
+      - traefik.http.routers.zaproxy.tls=true
       - traefik.http.routers.zaproxy.tls.certresolver=letsencrypt
       - traefik.http.routers.zaproxy.service=zaproxy
       - traefik.http.routers.zaproxy.middlewares=zap-ipallowlist
