@@ -14,7 +14,10 @@ services:
       - traefik.http.routers.zaproxy.entrypoints=websecure
       - traefik.http.routers.zaproxy.tls.certresolver=letsencrypt
       - traefik.http.routers.zaproxy.service=zaproxy
+      - traefik.http.routers.zaproxy.middlewares=zap-ipwhitelist
       - traefik.http.services.zaproxy.loadbalancer.server.port=8080
+      # IP Whitelist middleware - restrict access to admin IPs and Tailscale
+      - traefik.http.middlewares.zap-ipwhitelist.ipwhitelist.sourcerange=${ADMIN_IP_WHITELIST:-100.0.0.0/8,10.0.0.0/16}
     volumes:
       - zap-data:/zap/wrk:rw
 
