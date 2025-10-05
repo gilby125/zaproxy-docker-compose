@@ -19,7 +19,7 @@ services:
       - traefik.http.routers.zaproxy.middlewares=zap-ipallowlist
       - traefik.http.services.zaproxy.loadbalancer.server.port=8080
       # IP Allow List middleware - restrict access to admin IPs and Tailscale
-      - traefik.http.middlewares.zap-ipallowlist.ipallowlist.sourcerange=${ADMIN_IP_WHITELIST:-100.0.0.0/8,10.0.0.0/16}
+      - traefik.http.middlewares.zap-ipallowlist.ipallowlist.sourcerange=${ADMIN_IP_WHITELIST:-100.0.0.0/8, 10.0.0.0/16}
     volumes:
       - zap-data:/zap/wrk:rw
 
