@@ -1,4 +1,5 @@
 services:
+  # ZAP Security Scanner (daemon mode)
   zaproxy:
     image: zaproxy/zap-stable:latest
     user: zap
@@ -7,11 +8,11 @@ services:
       - 8080
       - 8090
     ports:
-      - "8082:8080"  # ZAP Web UI
+      - "8082:8080"  # ZAP API
       - "8090:8090"  # ZAP Proxy port
     environment:
       - ZAP_PORT=8090
-      - ZAP_API_KEY=${ZAP_API_KEY}
+      - ZAP_API_KEY=${ZAP_API_KEY:-}
     labels:
       - traefik.enable=true
       - traefik.docker.network=dokploy-network
@@ -22,7 +23,6 @@ services:
       - traefik.http.routers.zaproxy.service=zaproxy
       - traefik.http.routers.zaproxy.middlewares=zap-ipallowlist
       - traefik.http.services.zaproxy.loadbalancer.server.port=8080
-      # IP Allow List middleware - restrict access to admin IPs and Tailscale
       - traefik.http.middlewares.zap-ipallowlist.ipallowlist.sourcerange=${ADMIN_IP_WHITELIST:-100.0.0.0/8, 10.0.0.0/16}
     volumes:
       - zap-data:/zap/wrk:rw
@@ -31,6 +31,52 @@ services:
       default:
         aliases:
           - zaproxy
+    restart: unless-stopped
+
+  # MCP Server for AI agent integration (Claude Code, etc.)
+  mcp-server:
+    image: ghcr.io/dtkmn/mcp-zap-server:7556843
+    ports:
+      - "7456:7456"
+    environment:
+      - ZAP_BASE_URL=http://zaproxy:8080
+      - ZAP_API_KEY=${ZAP_API_KEY:-}
+      - MCP_SECURITY_ENABLED=${MCP_SECURITY_ENABLED:-true}
+      - MCP_SECURITY_MODE=${MCP_SECURITY_MODE:-api-key}
+      - MCP_API_KEY=${MCP_API_KEY}
+      - ZAP_MAX_ACTIVE_SCAN_DURATION=${ZAP_MAX_ACTIVE_SCAN_DURATION:-30}
+      - ZAP_MAX_SPIDER_SCAN_DURATION=${ZAP_MAX_SPIDER_SCAN_DURATION:-10}
+      - ZAP_ALLOW_PRIVATE_NETWORKS=${ZAP_ALLOW_PRIVATE_NETWORKS:-true}
+    depends_on:
+      - zaproxy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7456/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # Web Interface (React UI for scans & reports)
+  web-interface:
+    build:
+      context: ./web-interface
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - ZAP_API_URL=zaproxy
+      - PUBLIC_URL=${PUBLIC_URL:-http://192.168.1.191:3001}
+      - NODE_ENV=production
+    depends_on:
+      - zaproxy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
 
 volumes:
   zap-data:
