@@ -29,16 +29,19 @@ docker compose up -d
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              Docker Compose Network                      │
-│                                                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │
-│  │   ZAP        │  │ MCP Server   │  │Web Interface │   │
-│  │  (daemon)    │◄─│              │◄─│  (React UI)  │   │
-│  │  :8080       │  │  :7456       │  │   :3001      │   │
-│  └──────────────┘  └──────────────┘  └──────────────┘   │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+graph LR
+    UI["Web Interface<br/>(React UI)<br/>:3001"]
+    MCP["MCP Server<br/>(AI Agents)<br/>:7456"]
+    ZAP["ZAP Daemon<br/>(Security Scanner)<br/>:8080"]
+
+    UI -->|API Calls| MCP
+    MCP -->|Scans & Results| ZAP
+    UI -->|Proxy Access| ZAP
+
+    style UI fill:#4CAF50,stroke:#333,color:#fff
+    style MCP fill:#2196F3,stroke:#333,color:#fff
+    style ZAP fill:#FF9800,stroke:#333,color:#fff
 ```
 
 ## Environment Variables
