@@ -30,15 +30,15 @@ docker compose up -d
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    dokploy-network                          │
-│                                                             │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────────┐ │
-│  │   ZAP       │    │ MCP Server  │    │ Web Interface   │ │
-│  │  (daemon)   │◄───│             │◄───│ (React UI)      │ │
-│  │  :8080      │    │  :7456      │    │  :3001          │ │
-│  └─────────────┘    └─────────────┘    └─────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│              Docker Compose Network                      │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │
+│  │   ZAP        │  │ MCP Server   │  │Web Interface │   │
+│  │  (daemon)    │◄─│              │◄─│  (React UI)  │   │
+│  │  :8080       │  │  :7456       │  │   :3001      │   │
+│  └──────────────┘  └──────────────┘  └──────────────┘   │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ## Environment Variables
@@ -72,8 +72,18 @@ PUBLIC_URL=http://192.168.1.191:3001
 
 ## Deployment
 
-### Local / Docker Compose
+### Quick Start
+
 ```bash
+# Clone and setup
+git clone https://github.com/gilby125/zaproxy-docker-compose.git
+cd zaproxy-docker-compose
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your values, especially MCP_API_KEY
+
+# Deploy
 docker compose up -d
 ```
 
@@ -82,13 +92,29 @@ Access:
 - ZAP API: http://localhost:8082
 - Proxy: localhost:8090
 
-### Dokploy / Production
+### On a Remote Server
 
-1. Connect your GitHub account
-2. Create new Compose service
-3. Select `zaproxy-docker-compose` repo
-4. Set environment variables (at minimum `MCP_API_KEY`)
-5. Deploy
+```bash
+# SSH to your server
+ssh user@your-server
+
+# Clone repo
+git clone https://github.com/gilby125/zaproxy-docker-compose.git
+cd zaproxy-docker-compose
+
+# Setup environment
+cp .env.example .env
+nano .env  # Edit with your values
+
+# Deploy
+docker compose up -d
+```
+
+Then access via your server IP:
+- http://YOUR_SERVER_IP:3001 (Web UI)
+- http://YOUR_SERVER_IP:8082 (ZAP API)
+- YOUR_SERVER_IP:8090 (Proxy)
+
 
 ## Usage
 
@@ -182,8 +208,8 @@ sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keyc
 - Check health: `curl http://localhost:7456/actuator/health`
 
 **Web interface can't reach ZAP?**
-- Ensure ZAP is on the same network
-- Check `docker network ls` for `dokploy-network`
+- Ensure all services are running: `docker compose ps`
+- Check logs: `docker compose logs web-interface`
 
 ## References
 
