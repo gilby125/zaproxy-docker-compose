@@ -3,7 +3,14 @@ services:
   zaproxy:
     image: zaproxy/zap-stable:latest
     user: zap
-    command: zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -config api.disablekey=true
+    command: >
+      zap.sh -daemon -host 0.0.0.0 -port 8080
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+      -config api.disablekey=true
+      -addoninstall openapi
+      -addoninstall import-export
+      -addoninstall wappalyzer
     expose:
       - 8080
       - 8090

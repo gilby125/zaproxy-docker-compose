@@ -214,9 +214,45 @@ sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keyc
 - Ensure all services are running: `docker compose ps`
 - Check logs: `docker compose logs web-interface`
 
+## Add-ons
+
+ZAP add-ons extend functionality and are installed at startup. Currently installed:
+
+| Add-on | Purpose |
+|--------|---------|
+| **openapi** | Import/export OpenAPI/Swagger specs (v1.2, 2.0, 3.0) |
+| **import-export** | Export HAR files, import from various formats |
+| **wappalyzer** | Identify technologies, frameworks, servers used |
+
+### Add Your Own Add-ons
+
+Edit `docker-compose.yml` and add to the ZAP command:
+```yaml
+-addoninstall graphql      # For GraphQL APIs
+-addoninstall jython       # For custom scripting
+-addoninstall formhandler  # Better form handling
+```
+
+[Browse all add-ons](https://www.zaproxy.org/addons/)
+
+## API Reconstruction Workflow
+
+Capture and reconstruct APIs from proxy traffic:
+
+1. **Configure proxy** → Point your client/app to ZAP proxy (localhost:8090)
+2. **Capture traffic** → Use the app normally; ZAP records all requests
+3. **Export HAR** → Via API: `curl http://localhost:3001/zap/core/other/exporthar/?baseurl=http://yourapp`
+4. **Convert to OpenAPI** → Use external tools (e.g., `openapi-generator`, `swagger-codegen`)
+5. **Import back** → Upload OpenAPI spec to ZAP for scanning
+
+Example HAR export via web interface:
+- Run scans through the UI
+- Click "Download Report" → includes HAR data
+
 ## References
 
 - [OWASP ZAP Official](https://www.zaproxy.org/)
 - [ZAP Docker Docs](https://www.zaproxy.org/docs/docker/about/)
+- [ZAP OpenAPI Support](https://www.zaproxy.org/docs/desktop/addons/openapi-support/)
+- [ZAP Import/Export](https://www.zaproxy.org/docs/desktop/addons/import-export/)
 - [MCP Protocol](https://modelcontextprotocol.io/)
-- [Dokploy](https://dokploy.co/)
