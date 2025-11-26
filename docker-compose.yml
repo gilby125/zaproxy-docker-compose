@@ -2,12 +2,16 @@ services:
   zaproxy:
     image: zaproxy/zap-stable:latest
     user: zap
-    command: zap-webswing.sh
+    command: zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -config api.disablekey=true
     expose:
       - 8080
       - 8090
+    ports:
+      - "8082:8080"  # ZAP Web UI
+      - "8090:8090"  # ZAP Proxy port
     environment:
-      - ZAP_PORT=8080
+      - ZAP_PORT=8090
+      - ZAP_API_KEY=${ZAP_API_KEY}
     labels:
       - traefik.enable=true
       - traefik.docker.network=dokploy-network
@@ -22,9 +26,15 @@ services:
       - traefik.http.middlewares.zap-ipallowlist.ipallowlist.sourcerange=${ADMIN_IP_WHITELIST:-100.0.0.0/8, 10.0.0.0/16}
     volumes:
       - zap-data:/zap/wrk:rw
+      - zap-certs:/home/zap/.ZAP:rw
+    networks:
+      default:
+        aliases:
+          - zaproxy
 
 volumes:
   zap-data:
+  zap-certs:
 
 networks:
   default:

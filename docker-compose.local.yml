@@ -1,0 +1,16 @@
+services:
+  zaproxy:
+    image: zaproxy/zap-stable:latest
+    user: zap
+    command: zap-webswing.sh
+    ports:
+      - "8081:8080"  # ZAP Web UI
+      - "8090:8090"  # ZAP Proxy & API
+    environment:
+      - ZAP_PORT=8080
+    volumes:
+      - zap-data:/zap/wrk:rw
+    restart: unless-stopped
+
+volumes:
+  zap-data:
